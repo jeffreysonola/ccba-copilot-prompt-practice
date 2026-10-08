@@ -1,0 +1,1424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CCBA executive Copilot prompt practice dashboard">
+  <title>CCBA Copilot Prompt Practice</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+    :root {
+      --cp-brand-red: #f40009;
+      --cp-brand-red-hover: #d90008;
+      --cp-brand-slate: #455560;
+      --cp-brand-gray: #808285;
+      --cp-brand-white: #ffffff;
+      --cp-brand-black: #242424;
+      --cp-sidebar-bg: #455560;
+      --cp-sidebar-surface: rgba(255, 255, 255, 0.1);
+      --cp-sidebar-surface-hover: rgba(255, 255, 255, 0.16);
+      --cp-sidebar-border: rgba(255, 255, 255, 0.22);
+      --cp-sidebar-text: #ffffff;
+      --cp-sidebar-muted: rgba(255, 255, 255, 0.72);
+      --cp-focus-ring: rgba(244, 0, 9, 0.22);
+      --cp-card-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.14);
+      --cp-toast-bg: #242424;
+      --cp-toast-text: #ffffff;
+    }
+    html[data-theme="dark"] {
+      --cp-brand-red: #ff3b42;
+      --cp-brand-red-hover: #f40009;
+      --cp-sidebar-bg: #242424;
+      --cp-sidebar-surface: rgba(255, 255, 255, 0.08);
+      --cp-sidebar-surface-hover: rgba(255, 255, 255, 0.14);
+      --cp-sidebar-border: rgba(255, 255, 255, 0.18);
+      --cp-focus-ring: rgba(255, 59, 66, 0.28);
+      --cp-toast-bg: #ffffff;
+      --cp-toast-text: #242424;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    button,
+    a {
+      font: inherit;
+    }
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--cp-focus-ring);
+      outline-offset: 2px;
+    }
+    .app-shell {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 20;
+      display: flex;
+      width: 340px;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--cp-sidebar-bg);
+      color: var(--cp-sidebar-text);
+    }
+    .brand {
+      display: flex;
+      min-height: 132px;
+      align-items: center;
+      gap: 20px;
+      padding: 24px;
+      border-bottom: 1px solid var(--cp-sidebar-border);
+    }
+    .brand-logo {
+      width: 62px;
+      height: 88px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+    .brand-eyebrow {
+      margin: 0 0 4px;
+      color: var(--cp-sidebar-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+    .brand-title {
+      margin: 0;
+      color: var(--cp-sidebar-text);
+      font-size: 1.18rem;
+      line-height: 1.2;
+    }
+    .sidebar-heading {
+      margin: 0;
+      padding: 20px 24px 10px;
+      color: var(--cp-sidebar-muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .exercise-nav {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+      padding: 0 12px 20px;
+      scrollbar-width: thin;
+    }
+    .nav-item {
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: 0.625rem;
+      background: transparent;
+      color: var(--cp-sidebar-text);
+      cursor: pointer;
+      padding: 13px 12px;
+      text-align: left;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .nav-item:hover {
+      background: var(--cp-sidebar-surface-hover);
+      transform: translateX(2px);
+    }
+    .nav-item.is-active {
+      border-color: var(--cp-sidebar-border);
+      background: var(--cp-sidebar-surface);
+    }
+    .nav-item-topline {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .exercise-number {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 0.625rem;
+      background: var(--cp-brand-red);
+      color: var(--cp-brand-white);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .nav-item-title {
+      padding-top: 3px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .nav-item-skill {
+      display: block;
+      margin: 7px 0 0 38px;
+      color: var(--cp-sidebar-muted);
+      font-size: 0.76rem;
+      line-height: 1.3;
+    }
+    .sidebar-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--cp-sidebar-border);
+      color: var(--cp-sidebar-muted);
+      font-size: 0.75rem;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cp-brand-red);
+    }
+    .main {
+      grid-column: 2;
+      min-width: 0;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 76px;
+      gap: 16px;
+      padding: 16px clamp(20px, 4vw, 64px);
+      border-bottom: 1px solid var(--cp-border);
+      background: var(--cp-panel-strong);
+    }
+    .topbar-title {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+    .topbar-meta {
+      margin: 3px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+    }
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cp-text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .progress-track {
+      width: 110px;
+      height: 6px;
+      overflow: hidden;
+      border-radius: 0.625rem;
+      background: var(--cp-border);
+    }
+    .progress-fill {
+      width: 12.5%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--cp-brand-red);
+      transition: width 220ms ease;
+    }
+    .content {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      padding: clamp(32px, 5vw, 72px) clamp(20px, 4vw, 64px) 80px;
+    }
+    .exercise-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 12px;
+      color: var(--cp-brand-red);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .kicker::before {
+      width: 28px;
+      height: 3px;
+      background: var(--cp-brand-red);
+      content: "";
+    }
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+    }
+    .description {
+      max-width: 760px;
+      margin: 18px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 1.02rem;
+      line-height: 1.65;
+    }
+    .skill-panel {
+      width: 250px;
+      padding: 18px;
+      border: 1px solid var(--cp-border);
+      border-top: 4px solid var(--cp-brand-red);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      box-shadow: var(--cp-card-shadow);
+    }
+    .skill-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .skill-name {
+      display: block;
+      font-size: 1rem;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+    .capability {
+      margin: 10px 0 0;
+      color: var(--cp-text-soft);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .action-row[hidden] {
+      display: none;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      cursor: pointer;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .button:hover {
+      border-color: var(--cp-brand-red);
+      background: var(--cp-accent-soft);
+      transform: translateY(-1px);
+    }
+    .button.primary {
+      border-color: var(--cp-brand-red);
+      background: var(--cp-brand-red);
+      color: var(--cp-brand-white);
+    }
+    .button.primary:hover {
+      border-color: var(--cp-brand-red-hover);
+      background: var(--cp-brand-red-hover);
+    }
+    .button svg,
+    .copy-button svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+    .download-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .download-group:empty {
+      display: none;
+    }
+    .landing-content[hidden],
+    .section-title[hidden],
+    .prompt-list[hidden] {
+      display: none;
+    }
+    .landing-content {
+      display: grid;
+      gap: 28px;
+      margin-top: 8px;
+    }
+    .landing-intro {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .landing-card {
+      min-height: 170px;
+      padding: 22px;
+      border: 1px solid var(--cp-border);
+      border-top: 4px solid var(--cp-brand-red);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: var(--cp-card-shadow);
+    }
+    .landing-card-number {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 18px;
+      place-items: center;
+      border-radius: 0.625rem;
+      background: var(--cp-brand-red);
+      color: var(--cp-brand-white);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .landing-card h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .landing-card p {
+      margin: 8px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+    .journey-panel,
+    .prompting-panel {
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: var(--cp-card-shadow);
+    }
+    .landing-section-kicker {
+      margin: 0 0 8px;
+      color: var(--cp-brand-red);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .landing-section-title {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.5vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+    .landing-section-copy {
+      max-width: 760px;
+      margin: 10px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .journey-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin-top: 28px;
+    }
+    .journey-step {
+      position: relative;
+      padding: 0 18px 0 0;
+    }
+    .journey-step:not(:last-child)::after {
+      position: absolute;
+      top: 17px;
+      right: 10px;
+      width: calc(100% - 48px);
+      height: 2px;
+      background: var(--cp-border);
+      content: "";
+      transform: translateX(100%);
+    }
+    .journey-dot {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 14px;
+      place-items: center;
+      border: 3px solid var(--cp-brand-red);
+      border-radius: 50%;
+      background: var(--cp-surface);
+      color: var(--cp-brand-red);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .journey-step h3 {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+    .journey-step p {
+      margin: 6px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+    .ingredient-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 26px;
+    }
+    .ingredient {
+      padding: 20px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface-soft);
+    }
+    .ingredient-label {
+      display: inline-flex;
+      min-height: 30px;
+      align-items: center;
+      margin-bottom: 14px;
+      border-radius: 0.625rem;
+      background: var(--cp-brand-red);
+      color: var(--cp-brand-white);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .ingredient-question {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 750;
+      line-height: 1.4;
+    }
+    .ingredient-detail {
+      margin: 7px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+    .prompting-tip {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 20px;
+      padding: 16px;
+      border-left: 4px solid var(--cp-brand-red);
+      border-radius: 0.625rem;
+      background: var(--cp-accent-soft);
+    }
+    .prompting-tip strong {
+      color: var(--cp-brand-red);
+      font-size: 0.86rem;
+    }
+    .prompting-tip span {
+      color: var(--cp-text-muted);
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 34px 0 14px;
+    }
+    .section-title h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .section-title span {
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+    }
+    .prompt-list {
+      display: grid;
+      gap: 16px;
+    }
+    .prompt-card {
+      overflow: hidden;
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      background: var(--cp-surface);
+      box-shadow: var(--cp-card-shadow);
+    }
+    .prompt-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--cp-border);
+      background: var(--cp-surface-soft);
+    }
+    .prompt-index {
+      margin: 0 0 5px;
+      color: var(--cp-brand-red);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .prompt-title {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+    .prompt-summary {
+      margin: 6px 0 0;
+      color: var(--cp-text-muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    .copy-button {
+      display: inline-flex;
+      min-width: 88px;
+      min-height: 38px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--cp-border-strong);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      cursor: pointer;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .copy-button:hover {
+      border-color: var(--cp-brand-red);
+      color: var(--cp-brand-red);
+    }
+    .prompt-text {
+      margin: 0;
+      padding: 22px 20px 24px;
+      color: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.68;
+      white-space: pre-wrap;
+    }
+    .next-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--cp-border);
+    }
+    .next-context {
+      color: var(--cp-text-muted);
+      font-size: 0.78rem;
+    }
+    .next-title {
+      display: block;
+      margin-top: 3px;
+      color: var(--cp-text);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 50;
+      max-width: min(360px, calc(100vw - 48px));
+      border-radius: 0.625rem;
+      background: var(--cp-toast-bg);
+      color: var(--cp-toast-text);
+      opacity: 0;
+      padding: 13px 16px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .mobile-bar,
+    .mobile-nav {
+      display: none;
+    }
+    @media (max-width: 920px) {
+      .app-shell {
+        display: block;
+      }
+      .sidebar {
+        display: none;
+      }
+      .main {
+        width: 100%;
+      }
+      .mobile-bar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 68px;
+        padding: 10px 18px;
+        border-bottom: 1px solid var(--cp-sidebar-border);
+        background: var(--cp-sidebar-bg);
+        color: var(--cp-sidebar-text);
+      }
+      .mobile-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .mobile-brand img {
+        width: 30px;
+        height: 44px;
+        object-fit: contain;
+      }
+      .mobile-brand span {
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+      .mobile-select {
+        max-width: 48vw;
+        min-height: 38px;
+        border: 1px solid var(--cp-sidebar-border);
+        border-radius: 0.625rem;
+        background: var(--cp-sidebar-surface);
+        color: var(--cp-sidebar-text);
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+      .topbar {
+        position: static;
+      }
+      .exercise-header {
+        grid-template-columns: 1fr;
+      }
+      .skill-panel {
+        width: 100%;
+      }
+      .landing-intro,
+      .ingredient-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .journey-steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+      }
+      .journey-step::after {
+        display: none;
+      }
+    }
+    @media (max-width: 580px) {
+      .mobile-brand span {
+        display: none;
+      }
+      .mobile-select {
+        max-width: 72vw;
+      }
+      .topbar {
+        display: none;
+      }
+      .content {
+        padding-top: 32px;
+      }
+      .prompt-card-header {
+        flex-direction: column;
+      }
+      .copy-button {
+        width: 100%;
+      }
+      .next-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .next-row .button {
+        width: 100%;
+      }
+      .landing-intro,
+      .ingredient-grid,
+      .journey-steps {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Exercise navigation">
+      <div class="brand">
+        <img class="brand-logo" src="assets/ccba-logo.png" alt="Coca-Cola Beverages Africa">
+        <div>
+          <p class="brand-eyebrow">Executive learning</p>
+          <p class="brand-title">Copilot Prompt Practice</p>
+        </div>
+      </div>
+      <p class="sidebar-heading">Choose an exercise</p>
+      <nav class="exercise-nav" id="exerciseNav"></nav>
+      <div class="sidebar-footer">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Start here + 8 activities</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="mobile-bar">
+        <div class="mobile-brand">
+          <img src="assets/ccba-logo.png" alt="">
+          <span>Prompt Practice</span>
+        </div>
+        <label>
+          <span class="sr-only"></span>
+          <select class="mobile-select" id="mobileSelect" aria-label="Choose an exercise"></select>
+        </label>
+      </div>
+      <header class="topbar">
+        <div>
+          <p class="topbar-title">CCBA Executive Participant Prompt Guide</p>
+          <p class="topbar-meta">Select an exercise, copy a prompt, and use it in Microsoft 365 Copilot.</p>
+        </div>
+        <div class="progress" aria-label="Exercise position">
+          <span id="progressText">1 of 8</span>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="exercise-header" aria-labelledby="exerciseTitle">
+          <div>
+            <p class="kicker" id="exerciseKicker">Exercise 0</p>
+            <h1 id="exerciseTitle"></h1>
+            <p class="description" id="exerciseDescription"></p>
+          </div>
+          <aside class="skill-panel" aria-label="Learning focus">
+            <span class="skill-label">Skill you are building</span>
+            <strong class="skill-name" id="skillName"></strong>
+            <p class="capability" id="capability"></p>
+          </aside>
+        </section>
+
+        <section class="landing-content" id="landingContent" hidden>
+          <div class="landing-intro">
+            <article class="landing-card">
+              <span class="landing-card-number">1</span>
+              <h2>Work with your real priorities</h2>
+              <p>Use Copilot to prepare, research, analyze, and communicate around the decisions already on your agenda.</p>
+            </article>
+            <article class="landing-card">
+              <span class="landing-card-number">2</span>
+              <h2>Learn by doing</h2>
+              <p>Move from short demonstrations into hands-on practice using realistic executive scenarios across Microsoft 365.</p>
+            </article>
+            <article class="landing-card">
+              <span class="landing-card-number">3</span>
+              <h2>Leave with repeatable habits</h2>
+              <p>Build prompts and techniques you can reuse for briefings, reviews, analysis, research, and faster communication.</p>
+            </article>
+          </div>
+
+          <section class="journey-panel" aria-labelledby="journeyTitle">
+            <p class="landing-section-kicker">What the day looks like</p>
+            <h2 class="landing-section-title" id="journeyTitle">From first prompt to executive workflow</h2>
+            <p class="landing-section-copy">The session is designed to meet you where you are. We will establish the essentials, practise with real work, and progressively sharpen how Copilot supports your judgment.</p>
+            <div class="journey-steps">
+              <article class="journey-step">
+                <span class="journey-dot">01</span>
+                <h3>Ground Copilot</h3>
+                <p>Understand how Copilot uses your work context, files, messages, meetings, and the web.</p>
+              </article>
+              <article class="journey-step">
+                <span class="journey-dot">02</span>
+                <h3>Practise core workflows</h3>
+                <p>Prepare your day, research a live issue, and move from information to a clear decision.</p>
+              </article>
+              <article class="journey-step">
+                <span class="journey-dot">03</span>
+                <h3>Apply across Microsoft 365</h3>
+                <p>Use Word, Excel, PowerPoint, Outlook, and Researcher for connected executive work.</p>
+              </article>
+              <article class="journey-step">
+                <span class="journey-dot">04</span>
+                <h3>Make it yours</h3>
+                <p>Personalize responses, refine your prompting approach, and identify habits to keep using.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="prompting-panel" aria-labelledby="promptingTitle">
+            <p class="landing-section-kicker">The art and science of prompting</p>
+            <h2 class="landing-section-title" id="promptingTitle">Give Copilot the ingredients for a useful response</h2>
+            <p class="landing-section-copy">You do not need a perfect prompt. Start with the outcome you need, then add the context, sources, and expectations that will help Copilot produce a response you can act on.</p>
+            <div class="ingredient-grid">
+              <article class="ingredient">
+                <span class="ingredient-label">Goal</span>
+                <p class="ingredient-question">What do you want Copilot to do?</p>
+                <p class="ingredient-detail">State the task or decision clearly: summarize, compare, analyze, draft, or recommend.</p>
+              </article>
+              <article class="ingredient">
+                <span class="ingredient-label">Context</span>
+                <p class="ingredient-question">Why do you need it, and who is involved?</p>
+                <p class="ingredient-detail">Add the audience, business situation, priorities, constraints, and decision being prepared.</p>
+              </article>
+              <article class="ingredient">
+                <span class="ingredient-label">Source</span>
+                <p class="ingredient-question">Which information should Copilot use?</p>
+                <p class="ingredient-detail">Point to the relevant document, workbook, email thread, meeting, work data, or web sources.</p>
+              </article>
+              <article class="ingredient">
+                <span class="ingredient-label">Expectations</span>
+                <p class="ingredient-question">How should Copilot respond?</p>
+                <p class="ingredient-detail">Define the format, level of detail, tone, evidence, structure, and action you expect.</p>
+              </article>
+            </div>
+            <div class="prompting-tip">
+              <strong>Remember:</strong>
+              <span>Prompting is a conversation. Review the first response, challenge assumptions, add missing context, and ask Copilot to improve the result.</span>
+            </div>
+          </section>
+        </section>
+
+        <div class="action-row" id="exerciseActions" hidden>
+          <div class="download-group" id="downloadGroup"></div>
+        </div>
+
+        <div class="section-title" id="promptSectionTitle">
+          <h2>Prompts for this activity</h2>
+          <span id="promptCount"></span>
+        </div>
+        <section class="prompt-list" id="promptList" aria-live="polite"></section>
+
+        <div class="next-row">
+          <div>
+            <span class="next-context">Next exercise</span>
+            <span class="next-title" id="nextTitle"></span>
+          </div>
+          <button class="button" id="nextButton" type="button">
+            Continue
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const copyIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"></path></svg>';
+    const downloadIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>';
+
+    const exercises = [
+      {
+        number: 0,
+        landing: true,
+        title: "Start Here: Your Copilot Practice Day",
+        shortTitle: "Start here",
+        description: "A practical executive session designed to help you use Copilot with greater clarity, confidence, and purpose in the work you already do.",
+        skill: "Prompting foundations",
+        capability: "Grounding, prompt design, iteration, and executive judgment",
+        prompts: []
+      },
+      {
+        number: 1,
+        title: "Personalization: Teach Copilot How to Work With You",
+        shortTitle: "Personalize Copilot",
+        description: "Teach Copilot your role, priorities, and writing style so every answer starts closer to what you need.",
+        skill: "Personalization",
+        capability: "Custom instructions, memory, and writing-style analysis",
+        prompts: [
+          {
+            title: "Create personalized Copilot instructions",
+            summary: "Teach Copilot your role, priorities, communication style, and preferred ways of working.",
+            text: `I am [your role] at CCBA.
+
+Review my sent emails, documents, meetings, and other work context to understand how I work.
+
+Identify:
+- My role and core responsibilities
+- My biggest priorities and recurring areas of focus
+- How I prefer information to be presented
+- My communication and writing style
+- The level of detail I typically use
+- How I make decisions and what information I tend to care about
+- People, teams, and topics I frequently work with
+
+Turn what you learn into clear, concise Custom Instructions for Microsoft 365 Copilot.
+
+Write the instructions so Copilot knows how to work with me, how to communicate with me, and how to make its responses more useful to me.
+
+Separate the output into:
+- About me and my work
+- How I want Copilot to respond
+- My writing and communication style
+- My default preferences
+
+Make the final instructions ready for me to copy and paste into Custom Instructions.`
+          },
+          {
+            title: "Executive-ready example",
+            summary: "Adapt this concise example to your role and preferences.",
+            text: `I am the [insert role] at CCBA.
+
+- Give me the decision or key takeaway first.
+- Prefer bullet points over long paragraphs.
+- Keep responses concise and executive-ready.
+- Focus on business impact, risks, decisions, and next steps.
+- When presenting options, recommend the best option, don't just give me a list.
+- Use plain, direct language.
+- Do not use em dashes.
+- Do not use emojis.
+- When summarizing something, tell me:
+  - What happened
+  - Why it matters
+  - What I need to do
+- Challenge my thinking when there is an important risk, assumption, or alternative I may be missing.
+- When drafting for me, make it sound natural, confident, and concise, not overly formal.
+- If I haven't given enough context, ask a focused question rather than making assumptions.`
+          }
+        ]
+      },
+      {
+        number: 2,
+        title: "Prepare My Day in Copilot Chat",
+        shortTitle: "Prepare my day",
+        description: "Get a clear view of today's meetings, messages, and priorities, then walk into your most important meeting prepared.",
+        skill: "Grounding",
+        capability: "Copilot Chat grounded in your meetings, emails, Teams chats, and files",
+        prompts: [
+          {
+            title: "Build a prioritized daily briefing",
+            summary: "Turn your calendar and work context into an actionable executive brief.",
+            text: `Prepare me for my day. Review my calendar, relevant emails, chats, and files and give me an executive briefing on what matters most. For each meeting, tell me why it matters, who I’m meeting with, relevant context from previous conversations, decisions that may need to be made, and anything I should know going in. When helpful, surface the most relevant files I should review before each meeting and explain why each file matters. Identify urgent messages, outstanding commitments, risks, or things that could catch me off guard. Recommend where I should focus my attention and what questions I should be prepared to ask. End with my top priorities, decisions I need to make, and people I need to follow up with. Keep it concise and put the most important information first.`
+          }
+        ]
+      },
+      {
+        number: 3,
+        title: "Research a Topic on Every Executive's Mind",
+        shortTitle: "Research sugar tax",
+        description: "Use web-grounded Copilot Chat to get a current, cited view of sugar taxes across CCBA's markets and what they mean for the business.",
+        skill: "Research",
+        capability: "Web grounding, source evaluation, and business implication analysis",
+        prompts: [
+          {
+            title: "Assess sugar-tax business impacts",
+            summary: "Compare policy changes and translate them into commercial and profitability implications.",
+            text: `What is the latest on South Africa’s Health Promotion Levy and similar sugar taxes in Kenya, Tanzania, Uganda and Ethiopia? Summarize current rates, proposed changes and the potential impact on consumer affordability, demand, pricing, product mix and profitability for a soft drinks bottler. Cite current sources and clearly separate confirmed facts from proposed changes.`
+          }
+        ]
+      },
+      {
+        number: 4,
+        title: "Prepare for a Business Review in Word",
+        shortTitle: "Business review in Word",
+        description: "Use Copilot in Word to find the executive story in the Q3 pre-read, challenge its assumptions, and prepare for decisions.",
+        skill: "Critical reading",
+        capability: "Summarizing, challenging assumptions, and rewriting for a decision-maker",
+        downloads: [
+          {
+            label: "Download Word pre-read",
+            href: "assets/CCBA_Q3_2026_Commercial_Business_Review_PreRead.docx"
+          }
+        ],
+        prompts: [
+          {
+            title: "Extract the executive story and decisions",
+            summary: "Find the decisions, uncertainties, and evidence that matter most.",
+            text: `I have a meeting to discuss this pre-read. Help me prepare. Give me the executive-level story behind the numbers, not just a summary. Tell me what is performing well, what is underperforming or uncertain, what assumptions the plan depends on, and where the data may be misleading or incomplete. Identify the decisions I am being asked to make and the 3-5 things I should remember walking into the meeting. For each, explain why it matters and reference the supporting section or data in the document.`
+          },
+          {
+            title: "Pressure-test assumptions and risks",
+            summary: "Use focused questions to reveal unsupported assumptions and hidden risks.",
+            text: `Now pressure-test the pre-read from an executive perspective. Give me the 5 questions I should ask in the meeting that are most likely to expose an unsupported assumption, hidden risk, or missed opportunity. Focus especially on whether eB2B growth is truly incremental, what is driving the margin improvement, whether the Q4 plan is sufficiently stretching, the impact of currency, and whether the proposed Q4 investments have enough evidence to justify approval. For each question, briefly tell me why I should ask it and what a strong answer should contain.`
+          },
+          {
+            title: "Decide what to approve, challenge, or defer",
+            summary: "Separate evidence-backed decisions from those that require more analysis.",
+            text: `Based only on the evidence in this pre-read, tell me which decisions I should be comfortable making in the meeting, which I should challenge, and which I should defer until I have more information. For anything you recommend deferring, tell me exactly what evidence or analysis I should request before making the decision. Do not make assumptions beyond what is supported by the document.`
+          }
+        ]
+      },
+      {
+        number: 5,
+        title: "Variance Analysis and Commentary in Excel",
+        shortTitle: "Variance analysis in Excel",
+        description: "Use Copilot in Excel to find material Q3 variances, build an executive performance dashboard, and frame the decisions that follow.",
+        skill: "Variance analysis & commentary",
+        capability: "Analyst-style exploration, PivotTables, charts, and formulas",
+        downloads: [
+          {
+            label: "Download Excel tracker",
+            href: "assets/CCBA_Q3_2026_Sales_Revenue_Tracker.xlsx"
+          }
+        ],
+        prompts: [
+          {
+            title: "Identify material Q3 variances and drivers",
+            summary: "Explain what moved, what drove it, and what leadership should question.",
+            text: `Analyze this workbook and help me understand Q3 performance before making any changes to it. Start with the overall story, then compare actual results against plan and prior year across markets, channels, categories, brands and pack types. Identify the largest positive and negative variances in volume, net revenue and gross profit, and explain what appears to be driving them. Examine whether revenue growth is coming from volume, price and mix, channel shifts or portfolio changes. Pay particular attention to market differences, gross margin, net revenue per unit case, trade discounts, eB2B performance, active outlets, cooler placements and returnable packs. Highlight trends that are material to an executive, any results that may be misleading without further context, and any questions the data cannot answer. Finish with the five insights and five questions leadership should focus on.`
+          },
+          {
+            title: "Build an executive performance dashboard",
+            summary: "Create a decision-ready dashboard without changing the source data.",
+            text: `Using your analysis, create a polished executive dashboard in a new worksheet. Show headline KPIs for volume, net revenue, gross profit, gross margin, net revenue per unit case, plan attainment and growth versus prior year. Include multiple charts that reveal performance and variance by market, channel and month, the largest contributors to revenue and gross profit variance, portfolio and pack mix, and the relationship between active outlets, cooler placements and commercial performance. Add clear executive commentary beside the visuals explaining what happened, why it matters and where leadership attention is needed. Include a section for decisions and recommended actions, with each recommendation tied to evidence in the workbook. Make the dashboard easy to scan, use consistent formatting, and clearly label all units, comparisons and assumptions. Do not alter the underlying source data.`
+          },
+          {
+            title: "Identify decisions, priorities, and evidence gaps",
+            summary: "Optional: review the dashboard from an executive perspective.",
+            text: `Review the completed dashboard and act as an executive preparing for the Q3 business review. Tell me where performance is genuinely strong, where apparent outperformance needs to be challenged, and where intervention may be required. Recommend the three decisions leadership should make now, the three areas that should be monitored, and the additional analysis needed before committing further investment. For each recommendation, cite the supporting dashboard metric or chart, explain the expected business impact, and identify the risk of acting or not acting. Clearly separate what the data proves from what still requires management judgment.`
+          }
+        ]
+      },
+      {
+        number: 6,
+        title: "Build the Q3 Business Review in PowerPoint",
+        shortTitle: "Build the Q3 review",
+        description: "Turn the Word decision brief and Excel variance view into a concise, decision-oriented Q3 business review for the ELT.",
+        skill: "Storytelling",
+        capability: "Shaping evidence into a clear narrative with key messages and asks",
+        prompts: [
+          {
+            title: "Create the Q3 executive review",
+            summary: "Connect performance drivers, business impact, risks, opportunities, and Q4 decisions.",
+            text: `Create a polished executive presentation for the Q3 Commercial Business Review using the commercial pre-read and the executive dashboard in the Q3 sales and revenue workbook. Build a clear storyline that explains what happened, why it happened, where performance differs by market and channel, and what leadership needs to decide. Start with the executive takeaway, then cover performance versus plan and prior year, the largest market and channel variances, the drivers of revenue and gross profit, eB2B and outlet performance, key risks and opportunities, and the decisions required for Q4. Use the strongest charts and evidence from the workbook, but simplify them for an executive audience. Give each slide a takeaway headline that states the insight, not just the topic. End with three recommended actions, the expected business impact, and the decisions or support required from leadership. Keep the presentation concise, visually clear and grounded only in the supplied files.`
+          },
+          {
+            title: "Strengthen the presentation storyline",
+            summary: "Optional: sharpen every slide into a supported, decision-relevant takeaway.",
+            text: `Review the presentation as if you are a CCBA executive seeing it for the first time. Identify any slide that is too detailed, lacks a clear takeaway, is not supported by the data, or does not help leadership make a decision. Strengthen the storyline so the presentation clearly connects performance, variance, business impact and recommended action. Improve slide headlines so each one communicates the conclusion, simplify crowded content, and make the final recommendations more specific. Do not change the underlying facts or invent missing information.`
+          }
+        ]
+      },
+      {
+        number: 7,
+        title: "Summarise, Reply Fast, and Sound Like Me in Outlook",
+        shortTitle: "Reply faster in Outlook",
+        description: "Use Copilot in Outlook to catch up on a long thread, draft a reply in your own voice, and sharpen it before you send.",
+        skill: "Communication",
+        capability: "Summarizing, drafting in your voice, and refining tone",
+        prompts: [
+          {
+            title: "Teach Copilot your writing style",
+            summary: "Turn recurring patterns in your sent emails into practical writing instructions.",
+            text: `Analyze my sent emails to understand how I naturally communicate at work. Look for patterns in my tone, structure, length, level of formality, greetings, sign-offs, use of bullets, how I make requests, how I communicate decisions, and how I adjust my style for executives, peers and customers. Identify the characteristics that consistently make my writing sound like me. Then turn those findings into concise custom writing instructions I can give Copilot so future emails and messages sound like I wrote them. Include examples from my writing that support your recommendations.`
+          },
+          {
+            title: "Clarify the request and next action",
+            summary: "Understand the email thread before responding.",
+            text: `Summarize this email and the conversation that led up to it. Tell me what the sender is asking for, what I need to do, any decisions I need to make, important dates or commitments, and anything in the thread I should be careful not to miss. If there is relevant context from earlier in the thread, call it out. End with your recommended response and next action.`
+          },
+          {
+            title: "Draft a concise reply in your voice",
+            summary: "Reply naturally without inventing commitments.",
+            text: `Draft a reply to this email using my writing style and custom writing instructions. Address everything that requires a response, be clear about what I will do next, and keep it concise and natural. Do not add commitments, dates or information that I have not provided or that are not supported by the email thread.`
+          }
+        ]
+      },
+      {
+        number: 8,
+        title: "Go Deep With the Researcher Agent",
+        shortTitle: "Go deep with Researcher",
+        description: "Use Researcher to build a deep, cited view of the forces shaping soft drink demand and profitable growth.",
+        skill: "Deep research",
+        capability: "Framing strategic questions, weighing evidence, and making recommendations",
+        prompts: [
+          {
+            title: "Compare and prioritize growth options",
+            summary: "Evaluate market-specific growth choices and recommend what leadership should test.",
+            text: `Research how CCBA could strengthen customer-led, profitable growth in [market] over the next 12 to 24 months. Compare opportunities across affordable pack-price architecture, targeted channel and promotion choices, and improved product availability through distributor and outlet execution. Use current, credible sources and relevant examples from comparable African beverage and consumer-goods markets. Evaluate the potential customer impact, growth opportunity, profitability, risks and execution considerations of each approach. Clearly distinguish facts from assumptions and identify where internal CCBA data would be needed to validate your findings.
+
+End with:
+- The opportunity leadership should prioritize and why
+- What CCBA should test first
+- What internal data is needed to validate the recommendation
+- What evidence could change the recommendation
+- Five questions leadership should ask before making a decision`
+          },
+          {
+            title: "Assess demand and profitability forces",
+            summary: "Turn market evidence into leadership actions and decision questions.",
+            text: `Research the biggest forces that will shape soft drink demand and profitability across South Africa, Kenya, Tanzania, Uganda, Ethiopia and Mozambique over the next 18 months: consumer affordability, currency, sugar taxes, packaging and recycling regulation, and modern vs informal retail. For each, give the evidence, the likely impact on a Coca-Cola bottler, and two moves leadership should consider. Use current, cited sources and finish with a one-page executive summary that clearly identifies:
+
+- The decisions leadership should consider
+- What CCBA should act on or test first
+- The internal data needed to validate the recommendations
+- What evidence could change the recommendations
+- Five questions executives should ask before taking action`
+          }
+        ]
+      }
+    ];
+
+    const elements = {
+      nav: document.getElementById("exerciseNav"),
+      mobileSelect: document.getElementById("mobileSelect"),
+      kicker: document.getElementById("exerciseKicker"),
+      title: document.getElementById("exerciseTitle"),
+      description: document.getElementById("exerciseDescription"),
+      skill: document.getElementById("skillName"),
+      capability: document.getElementById("capability"),
+      promptList: document.getElementById("promptList"),
+      promptSectionTitle: document.getElementById("promptSectionTitle"),
+      promptCount: document.getElementById("promptCount"),
+      landingContent: document.getElementById("landingContent"),
+      exerciseActions: document.getElementById("exerciseActions"),
+      downloadGroup: document.getElementById("downloadGroup"),
+      progressText: document.getElementById("progressText"),
+      progressFill: document.getElementById("progressFill"),
+      nextTitle: document.getElementById("nextTitle"),
+      nextButton: document.getElementById("nextButton"),
+      toast: document.getElementById("toast")
+    };
+
+    let activeIndex = 0;
+    let toastTimer;
+
+    function buildNavigation() {
+      exercises.forEach((exercise, index) => {
+        const button = document.createElement("button");
+        button.className = "nav-item";
+        button.type = "button";
+        button.dataset.index = index;
+        button.innerHTML = `
+          <span class="nav-item-topline">
+            <span class="exercise-number">${exercise.number}</span>
+            <span class="nav-item-title">${exercise.shortTitle}</span>
+          </span>
+          <span class="nav-item-skill">${exercise.skill}</span>`;
+        button.addEventListener("click", () => renderExercise(index));
+        elements.nav.appendChild(button);
+
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${exercise.number}. ${exercise.shortTitle}`;
+        elements.mobileSelect.appendChild(option);
+      });
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      elements.toast.textContent = message;
+      elements.toast.classList.add("is-visible");
+      toastTimer = setTimeout(() => elements.toast.classList.remove("is-visible"), 2200);
+    }
+
+    async function copyText(text, successMessage) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.setAttribute("readonly", "");
+          textArea.style.position = "fixed";
+          textArea.style.opacity = "0";
+          document.body.appendChild(textArea);
+          textArea.select();
+          const copied = document.execCommand("copy");
+          textArea.remove();
+          if (!copied) throw new Error("Copy command was not accepted.");
+        }
+        showToast(successMessage);
+      } catch (error) {
+        showToast("Copy was blocked. Select the prompt text and copy it manually.");
+      }
+    }
+
+    function renderPrompts(exercise) {
+      elements.promptList.replaceChildren();
+      exercise.prompts.forEach((prompt, index) => {
+        const card = document.createElement("article");
+        card.className = "prompt-card";
+
+        const header = document.createElement("div");
+        header.className = "prompt-card-header";
+
+        const headingGroup = document.createElement("div");
+        const indexLabel = document.createElement("p");
+        indexLabel.className = "prompt-index";
+        indexLabel.textContent = `Prompt ${index + 1}`;
+        const heading = document.createElement("h3");
+        heading.className = "prompt-title";
+        heading.textContent = prompt.title;
+        const summary = document.createElement("p");
+        summary.className = "prompt-summary";
+        summary.textContent = prompt.summary;
+        headingGroup.append(indexLabel, heading, summary);
+
+        const copyButton = document.createElement("button");
+        copyButton.className = "copy-button";
+        copyButton.type = "button";
+        copyButton.setAttribute("aria-label", `Copy prompt ${index + 1}: ${prompt.title}`);
+        copyButton.innerHTML = `${copyIcon}<span>Copy</span>`;
+        copyButton.addEventListener("click", () => copyText(prompt.text, `Prompt ${index + 1} copied`));
+
+        const text = document.createElement("pre");
+        text.className = "prompt-text";
+        text.textContent = prompt.text;
+
+        header.append(headingGroup, copyButton);
+        card.append(header, text);
+        elements.promptList.appendChild(card);
+      });
+    }
+
+    function renderDownloads(exercise) {
+      elements.downloadGroup.replaceChildren();
+      const downloads = exercise.downloads || [];
+      elements.exerciseActions.hidden = downloads.length === 0;
+      downloads.forEach((download) => {
+        const link = document.createElement("a");
+        link.className = "button";
+        link.href = download.href;
+        link.download = "";
+        link.innerHTML = `${downloadIcon}<span>${download.label}</span>`;
+        elements.downloadGroup.appendChild(link);
+      });
+    }
+
+    function renderExercise(index) {
+      activeIndex = index;
+      const exercise = exercises[index];
+      const nextIndex = (index + 1) % exercises.length;
+      const nextExercise = exercises[nextIndex];
+
+      elements.kicker.textContent = `Exercise ${exercise.number}`;
+      elements.title.textContent = exercise.title;
+      elements.description.textContent = exercise.description;
+      elements.skill.textContent = exercise.skill;
+      elements.capability.textContent = exercise.capability;
+      elements.landingContent.hidden = !exercise.landing;
+      elements.promptSectionTitle.hidden = Boolean(exercise.landing);
+      elements.promptList.hidden = Boolean(exercise.landing);
+      elements.promptCount.textContent = `${exercise.prompts.length} ${exercise.prompts.length === 1 ? "prompt" : "prompts"}`;
+      elements.progressText.textContent = index === 0 ? "Start" : `${index} of ${exercises.length - 1}`;
+      elements.progressFill.style.width = `${(index / (exercises.length - 1)) * 100}%`;
+      elements.nextTitle.textContent = nextExercise.title;
+      elements.nextButton.dataset.nextIndex = nextIndex;
+      elements.mobileSelect.value = String(index);
+
+      document.querySelectorAll(".nav-item").forEach((button, buttonIndex) => {
+        const isActive = buttonIndex === index;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-current", isActive ? "step" : "false");
+      });
+
+      renderDownloads(exercise);
+      renderPrompts(exercise);
+      document.title = `${exercise.shortTitle} | CCBA Prompt Practice`;
+
+      if (window.scrollY > 100) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    elements.nextButton.addEventListener("click", () => {
+      renderExercise(Number(elements.nextButton.dataset.nextIndex));
+    });
+
+    elements.mobileSelect.addEventListener("change", (event) => {
+      renderExercise(Number(event.target.value));
+    });
+
+    buildNavigation();
+    renderExercise(0);
+  </script>
+</body>
+</html>
