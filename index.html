@@ -1367,7 +1367,7 @@ End with:
         const link = document.createElement("a");
         link.className = "button";
         link.href = download.href;
-        link.download = "";
+        link.download = download.downloadName || decodeURIComponent(download.href.split("/").pop().split("?")[0]);
         link.innerHTML = `${downloadIcon}<span>${download.label}</span>`;
         elements.downloadGroup.appendChild(link);
       });
